@@ -14,17 +14,16 @@ public class CameraTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
 
+
+    final Sensor sense = context.mock(Sensor.class);
+    final MemoryCard mem = context.mock(MemoryCard.class);
+
+    // write your test here
+    Camera cam = new Camera(sense,mem);
+
+
     @Test
     public void switchingTheCameraOnPowersUpTheSensor() {
-
-        final Sensor sense = context.mock(Sensor.class);
-
-         // write your test here
-        Camera cam = new Camera(sense);
-
-
-
-
 
         context.checking(new Expectations() {{
         exactly(1).of(sense).powerUp();
@@ -38,15 +37,6 @@ public class CameraTest {
     public void switchingTheCameraOffPowersDownTheSensor()
     {
 
-        final Sensor sense = context.mock(Sensor.class);
-
-        // write your test here
-        Camera cam = new Camera(sense);
-
-
-
-
-
         context.checking(new Expectations() {{
             exactly(1).of(sense).powerDown();
 
@@ -55,6 +45,51 @@ public class CameraTest {
         cam.powerOff();
 
     }
-    
+
+    @Test
+    public void pressingTheShutterWhenPowerIsOffDoesNothing()
+    {
+
+
+
+        context.checking(new Expectations() {{
+            exactly(0).of(sense).readData();
+
+        }});
+
+        cam.pressShutter();
+
+
+
+    }
+
+    @Test
+    public void pressingTheShutterWhenPowerIsOnReadsDataAndWritesToMemoryCard()
+    {
+
+        final byte[] imagedata = new byte[5];
+
+        context.checking(new Expectations() {{
+            exactly(1).of(sense).powerUp();
+
+        }});
+        context.checking(new Expectations() {{
+            exactly(1).of(sense).readData();
+            will(returnValue(imagedata));
+        }});
+
+
+        context.checking(new Expectations() {{
+
+            exactly(1).of(mem).write(imagedata);
+
+        }});
+
+        cam.powerOn();
+        cam.pressShutter();
+
+
+
+    }
 
 }
