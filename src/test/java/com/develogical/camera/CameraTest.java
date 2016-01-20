@@ -34,6 +34,27 @@ public class CameraTest {
         cam.powerOn();
     }
 
+    @Test
+    public void switchingTheCameraOffPowersDownTheSensor()
+    {
 
+        final Sensor sense = context.mock(Sensor.class);
+
+        // write your test here
+        Camera cam = new Camera(sense);
+
+
+
+
+
+        context.checking(new Expectations() {{
+            exactly(1).of(sense).powerDown();
+
+        }});
+
+        cam.powerOff();
+
+    }
+    
 
 }
